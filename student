@@ -1,0 +1,164 @@
+import random
+
+grade_points = {'O': 10, 'A': 9, 'B': 8, 'C': 7, 'D': 5, 'U': 0}
+
+def generate_student_data():
+    names = ["Student_" + str(i+1) for i in range(31)]
+    registers= [f"1234567{i+1}" for i in range(31)]
+    students = []
+    for name, register in zip(names, registers):
+        grades = random.choices(list(grade_points.keys()), k=5)
+        total_marks = sum(grade_points[grade] for grade in grades)
+        percentage = (total_marks / 50) * 100  
+        students.append((name, register, grades, total_marks, percentage))
+    return students
+
+def create_result_file(file_path):
+    students = generate_student_data()
+    with open(file_path, 'w') as file:
+        for student in students:
+            name, register, grades, total_marks, percentage = student
+            grades_str = ','.join(grades)
+            file.write(f"{name},{register},{grades_str},{total_marks},{percentage:.2f}\n")
+
+def read_result_file(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+        print(content)
+
+def analyze_results(input_file, output_file):
+    students = []
+    
+    with open(input_file, 'r') as file:
+        for line in file:
+            data = line.strip().split(',')
+            name = data[0]
+            register = int(data[1])
+            grades = data[2:7]
+            total_marks = int(data[7])
+            percentage = float(data[8])
+            students.append((name, register, grades, total_marks, percentage))
+
+    categories = {
+        '90_and_above': [],
+        '80_to_89': [],
+        '70_to_79': [],
+        'below_70': [],
+        'arrear': []
+    }
+    
+    for student in students:
+        name, register, grades, total_marks, percentage = student
+        if 'U' in grades:
+            categories['arrear'].append(student)
+        elif percentage >= 90:
+            categories['90_and_above'].append(student)
+        elif percentage >= 80:
+            categories['80_to_89'].append(student)
+        elif percentage >= 70:
+            categories['70_to_79'].append(student)
+        else:
+            categories['below_70'].append(student)
+    
+    with open(output_file, 'w') as file:
+        for category, students in categories.items():
+            file.write(f"Category: {category.replace('_', ' ').title()}\n")
+            file.write(f"{'Name':<15}{'Register Number':<15}{'Total Marks':<15}{'Percentage':<10}\n")
+            for student in students:
+                name, register, grades, total_marks, percentage = student
+                file.write(f"{name:<15}{register:<15}{total_marks:<15}{percentage:<10.2f}\n")
+            file.write("\n")
+
+create_result_file('result.txt')
+
+read_result_file('result.txt')
+
+analyze_results('result.txt', 'analysis.txt')
+
+read_result_file('analysis.txt')
+
+output
+
+Student_1,12345671,D,U,O,C,D,27,54.00
+Student_2,12345672,A,O,D,C,B,39,78.00
+Student_3,12345673,C,A,C,C,B,38,76.00
+Student_4,12345674,D,A,B,A,O,41,82.00
+Student_5,12345675,B,U,U,B,O,26,52.00
+Student_6,12345676,O,B,O,D,O,43,86.00
+Student_7,12345677,U,A,O,D,C,31,62.00
+Student_8,12345678,O,O,B,C,O,45,90.00
+Student_9,12345679,D,A,B,O,A,41,82.00
+Student_10,123456710,D,C,O,O,B,40,80.00
+Student_11,123456711,U,B,U,A,C,24,48.00
+Student_12,123456712,C,C,B,O,U,32,64.00
+Student_13,123456713,O,U,U,O,U,20,40.00
+Student_14,123456714,U,U,D,B,C,20,40.00
+Student_15,123456715,O,D,B,A,C,39,78.00
+Student_16,123456716,D,U,O,U,B,23,46.00
+Student_17,123456717,U,U,U,D,O,15,30.00
+Student_18,123456718,A,O,C,D,U,31,62.00
+Student_19,123456719,D,C,B,A,O,39,78.00
+Student_20,123456720,B,B,O,B,C,41,82.00
+Student_21,123456721,A,B,D,B,O,40,80.00
+Student_22,123456722,D,O,U,C,A,31,62.00
+Student_23,123456723,A,O,A,C,O,45,90.00
+Student_24,123456724,A,B,B,D,D,35,70.00
+Student_25,123456725,B,D,D,O,O,38,76.00
+Student_26,123456726,C,A,O,D,U,31,62.00
+Student_27,123456727,U,O,U,U,B,18,36.00
+Student_28,123456728,D,C,O,A,B,39,78.00
+Student_29,123456729,O,U,D,O,B,33,66.00
+Student_30,123456730,O,B,O,B,D,41,82.00
+Student_31,123456731,A,U,B,D,A,31,62.00
+
+Category: 90 And Above
+Name           Register NumberTotal Marks    Percentage
+Student_8      12345678       45             90.00     
+Student_23     123456723      45             90.00     
+
+Category: 80 To 89
+Name           Register NumberTotal Marks    Percentage
+Student_4      12345674       41             82.00     
+Student_6      12345676       43             86.00     
+Student_9      12345679       41             82.00     
+Student_10     123456710      40             80.00     
+Student_20     123456720      41             82.00     
+Student_21     123456721      40             80.00     
+Student_30     123456730      41             82.00     
+
+Category: 70 To 79
+Name           Register NumberTotal Marks    Percentage
+Student_2      12345672       39             78.00     
+Student_3      12345673       38             76.00     
+Student_15     123456715      39             78.00     
+Student_19     123456719      39             78.00     
+Student_24     123456724      35             70.00     
+Student_25     123456725      38             76.00     
+Student_28     123456728      39             78.00     
+
+Category: Below 70
+Name           Register NumberTotal Marks    Percentage
+
+Category: Arrear
+Name           Register NumberTotal Marks    Percentage
+Student_1      12345671       27             54.00     
+Student_5      12345675       26             52.00     
+Student_7      12345677       31             62.00     
+Student_11     123456711      24             48.00     
+Student_12     123456712      32             64.00     
+Student_13     123456713      20             40.00     
+Student_14     123456714      20             40.00     
+Student_16     123456716      23             46.00     
+Student_17     123456717      15             30.00     
+Student_18     123456718      31             62.00     
+Student_22     123456722      31             62.00     
+Student_26     123456726      31             62.00     
+Student_27     123456727      18             36.00     
+Student_29     123456729      33             66.00     
+Student_31     123456731      31             62.00
+
+
+
+
+
+
